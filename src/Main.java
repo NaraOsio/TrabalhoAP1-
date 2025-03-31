@@ -3,10 +3,15 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Digite o número de linhas e colunas:");
+
+        System.out.println("Digite o número de linhas:");
         int linhas = scanner.nextInt();
+
+        System.out.println("Digite o número de colunas:");
         int colunas = scanner.nextInt();
+
         Matriz matriz = new Matriz(linhas, colunas);
+
         System.out.println("Preencher com (true/false):");
         matriz.preencherMatriz(scanner.nextBoolean());
 
