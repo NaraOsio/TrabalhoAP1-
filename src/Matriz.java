@@ -1,107 +1,135 @@
 import java.util.Random;
-import java.util.Scanner;
 
 public class Matriz {
-    private int[][] matriz;
-    private int linhas, colunas;
+    private int[][] dados;
+    private int linhas;
+    private int colunas;
 
     public Matriz(int linhas, int colunas) {
         this.linhas = linhas;
         this.colunas = colunas;
-        this.matriz = new int[linhas][colunas];
+        dados = new int[linhas][colunas];
     }
-    public void preencherMatriz(boolean aleatorio) {
-        Scanner scanner = new Scanner(System.in);
-        Random rand = new Random();
+
+    public void preencherAleatorio(int limite) {
+        Random random = new Random();
         for (int i = 0; i < linhas; i++) {
             for (int j = 0; j < colunas; j++) {
-                matriz[i][j] = aleatorio ? rand.nextInt(100) : scanner.nextInt();
+                dados[i][j] = random.nextInt(limite + 1);
             }
         }
     }
+
+    public void preencherManual(int[][] valores) {
+        for (int i = 0; i < linhas; i++) {
+            for (int j = 0; j < colunas; j++) {
+                dados[i][j] = valores[i][j];
+            }
+        }
+    }
+
     public void inserirElemento(int linha, int coluna, int valor) {
-        if (linha < linhas && coluna < colunas) {
-            matriz[linha][coluna] = valor;
+        if (linha >= 0 && linha < linhas && coluna >= 0 && coluna < colunas) {
+            dados[linha][coluna] = valor;
         }
     }
+
     public void removerElemento(int linha, int coluna) {
-        if (linha < linhas && coluna < colunas) {
-            matriz[linha][coluna] = 0;
+        if (linha >= 0 && linha < linhas && coluna >= 0 && coluna < colunas) {
+            dados[linha][coluna] = 0; // zera o valor
         }
     }
-    public void exibirMatriz() {
-        for (int[] linha : matriz) {
-            for (int elemento : linha) {
-                System.out.print(elemento + " ");
+
+    public void exibir() {
+        for (int[] linha : dados) {
+            for (int valor : linha) {
+                System.out.printf("%4d", valor);
             }
             System.out.println();
         }
     }
+
     public void ordenarLinhas() {
-        for (int[] linha : matriz) {
-            bubbleSort(linha);
+        for (int i = 0; i < linhas; i++) {
+            bubbleSort(dados[i]);
         }
     }
+
     public void ordenarColunas() {
         for (int j = 0; j < colunas; j++) {
             int[] coluna = new int[linhas];
             for (int i = 0; i < linhas; i++) {
-                coluna[i] = matriz[i][j];
+                coluna[i] = dados[i][j];
             }
             bubbleSort(coluna);
             for (int i = 0; i < linhas; i++) {
-                matriz[i][j] = coluna[i];
+                dados[i][j] = coluna[i];
             }
         }
     }
+
     public void ordenarMatrizCompleta() {
-        int[] vetor = new int[linhas * colunas];
-        int index = 0;
-        for (int[] linha : matriz) {
-            for (int elemento : linha) {
-                vetor[index++] = elemento;
+        int total = linhas * colunas;
+        int[] vetor = new int[total];
+        int k = 0;
+
+        // Achatar a matriz
+        for (int[] linha : dados) {
+            for (int valor : linha) {
+                vetor[k++] = valor;
             }
         }
+
         mergeSort(vetor, 0, vetor.length - 1);
-        index = 0;
+
+        k = 0;
         for (int i = 0; i < linhas; i++) {
             for (int j = 0; j < colunas; j++) {
-                matriz[i][j] = vetor[index++];
+                dados[i][j] = vetor[k++];
             }
         }
     }
-    private void bubbleSort(int[] arr) {
-        int n = arr.length;
+
+
+    private void bubbleSort(int[] vetor) {
+        int n = vetor.length;
         for (int i = 0; i < n - 1; i++) {
-            for (int j = 0; j < n - i - 1; j++) {
-                if (arr[j] > arr[j + 1]) {
-                    int temp = arr[j];
-                    arr[j] = arr[j + 1];
-                    arr[j + 1] = temp;
+            for (int j = 0; j < n - 1 - i; j++) {
+                if (vetor[j] > vetor[j + 1]) {
+                    int temp = vetor[j];
+                    vetor[j] = vetor[j + 1];
+                    vetor[j + 1] = temp;
                 }
             }
         }
     }
-    private void mergeSort(int[] arr, int left, int right) {
-        if (left < right) {
-            int mid = (left + right) / 2;
-            mergeSort(arr, left, mid);
-            mergeSort(arr, mid + 1, right);
-            merge(arr, left, mid, right);
+    private void mergeSort(int[] vetor, int inicio, int fim) {
+        if (inicio < fim) {
+            int meio = (inicio + fim) / 2;
+            mergeSort(vetor, inicio, meio);
+            mergeSort(vetor, meio + 1, fim);
+            intercalar(vetor, inicio, meio, fim);
         }
     }
-    private void merge(int[] arr, int left, int mid, int right) {
-        int n1 = mid - left + 1;
-        int n2 = right - mid;
-        int[] L = new int[n1];
-        int[] R = new int[n2];
-        System.arraycopy(arr, left, L, 0, n1);
-        System.arraycopy(arr, mid + 1, R, 0, n2);
-        int i = 0, j = 0, k = left;
-        while (i < n1 && j < n2) {
-            arr[k++] = (L[i] <= R[j]) ? L[i++] : R[j++];
+
+    private void intercalar(int[] vetor, int inicio, int meio, int fim) {
+        int[] temp = new int[fim - inicio + 1];
+        int i = inicio, j = meio + 1, k = 0;
+
+        while (i <= meio && j <= fim) {
+            if (vetor[i] <= vetor[j]) {
+                temp[k++] = vetor[i++];
+            } else {
+                temp[k++] = vetor[j++];
+            }
         }
-        while (i < n1) arr[k++] = L[i++];
-        while (j < n2) arr[k++] = R[j++];
+
+        while (i <= meio) temp[k++] = vetor[i++];
+        while (j <= fim) temp[k++] = vetor[j++];
+
+        for (i = 0; i < temp.length; i++) {
+            vetor[inicio + i] = temp[i];
+        }
     }
 }
+
